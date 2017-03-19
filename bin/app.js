@@ -60,7 +60,9 @@ var checkGitResponse = function() {
     if (needleInHaystack( 'Not a git repository', statusMessage )) {
         return responses.notGit;
     }
-    else if ( needleInHaystack("Your branch is up-to-date", statusMessage) && needleInHaystack("nothing to commit", statusMessage )) {
+    else if ( needleInHaystack("Your branch is up-to-date", statusMessage)
+        && needleInHaystack("clean", statusMessage )
+        && needleInHaystack("nothing to commit", statusMessage )) {
         return responses.ok;
     }
     else if ( needleInHaystack("nothing to commit", statusMessage )) {
@@ -77,30 +79,45 @@ var checkGitResponse = function() {
 
 var buildResponse = function( response, advanced ) {
     if (response.message) {
-        if (advanced) {
-            console.log( colors.green( '--- ' + shell.pwd() + ' ---' ) );
-            console.log( 'Status: '.bold.white + colors.green( response.icon + '  ' + response.message ) );
-            // console.log( 'File:   '.bold.white + shell.pwd() );
-            console.log();
-        }
-        else {
-            console.log(response.icon + '  '
-                + colors.bold[ response.color ]( response.message )
-                + ' in ' + shell.pwd()
-            );
-        }
+        console.log(response.icon + '  '
+            + colors.bold[ response.color ]( response.message )
+            + ' in ' + shell.pwd()
+        );
     }
     // shell.cd( path );
+}
+
+var checkAllBranches = function() {
+    var currentBranch = shell.exec( 'git rev-parse --abbrev-ref HEAD', {silent: true} ).toString().slice( 0, -1 );
+    var branches = getAllBranches( currentBranch );
+    if (branches.length) {
+        console.log(branches);
+    }
+}
+
+var getAllBranches = function( currentBranch ) {
+    return shell.exec('git branch', {silent:true}).toString().split( '\n' )
+    .map( function(branchName) {
+        var name = branchName.replace( /^\**\s+([A-z\-_]+)$/, '$1' )
+        return name;
+    } )
+    .slice(0,-1)
+    .filter( function( branchName ) {
+        return branchName != currentBranch;
+    } );
 }
 
 var checkGitStatus = function( path ) {
     var response = checkGitResponse();
 
-    buildResponse( response );
-
     if (response.continue) {
         checkSubDirectory();
+        return false;
     }
+
+    buildResponse( response );
+    checkAllBranches();
+
 };
 
 var checkSubDirectory = function() {
