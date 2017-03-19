@@ -1,0 +1,17 @@
+{
+  "name": "sub-git",
+  "version": "0.1.0",
+  "description": "Run git commands on all recursive folders",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lasse S. Haslev",
+  "bin": {
+    "sub-git": "./bin/app.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "shelljs": "^0.7.7"
+  }
+}
