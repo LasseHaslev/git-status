@@ -1,5 +1,5 @@
 {
-  "name": "sub-git",
+  "name": "git-status",
   "version": "0.1.0",
   "description": "Run git commands on all recursive folders",
   "main": "app.js",
@@ -8,7 +8,7 @@
   },
   "author": "Lasse S. Haslev",
   "bin": {
-    "sub-git": "./bin/app.js"
+    "git-status": "./bin/app.js"
   },
   "license": "ISC",
   "dependencies": {
