@@ -33,6 +33,11 @@ var responses = {
         continue: false,
         icon: '❗️',
     },
+    uncatched: {
+        message: 'We could not this git status response',
+        continue: false,
+        icon: '❗️',
+    },
 };
     
 
@@ -61,13 +66,11 @@ var checkGitResponse = function() {
     else if ( needleInHaystack("nothing to commit", statusMessage )) {
         return responses.notPushed;
     }
-
     else if ( needleInHaystack("Your branch is up-to-date", statusMessage) || ! needleInHaystack("nothing to commit, working directory clean", statusMessage )) {
         return responses.uncommited;
     }
-
-    else if (! needleInHaystack("Your branch is up-to-date", statusMessage )) {
-        return resonses.notPushed;
+    else {
+        return responses.uncatched;
     }
 
 };
