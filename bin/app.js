@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 var shell = require( 'shelljs' );
+var colors = require( 'colors' );
 
 var pwd;
 
@@ -17,26 +18,25 @@ var responses = {
         message: 'Everything is ok',
         continue: false,
         icon: '✅',
+        color: 'green',
     },
     notPushed: {
         message: 'Changes are not pushed to remote',
         continue: false,
         icon: '❗️',
+        color: 'red',
     },
     uncommited: {
         message: 'Uncommited changes',
         continue: false,
         icon: '⛔️',
-    },
-    unpublished: {
-        message: 'Not public',
-        continue: false,
-        icon: '❗️',
+        color: 'red',
     },
     uncatched: {
         message: 'We could not this git status response',
         continue: false,
         icon: '❗️',
+        color: 'green',
     },
 };
     
@@ -75,13 +75,20 @@ var checkGitResponse = function() {
 
 };
 
-var buildResponse = function( response ) {
+var buildResponse = function( response, advanced ) {
     if (response.message) {
-        console.log(response.icon
-            + '  '
-            + response.message
-            + ' in '
-            + shell.pwd());
+        if (advanced) {
+            console.log( colors.green( '--- ' + shell.pwd() + ' ---' ) );
+            console.log( 'Status: '.bold.white + colors.green( response.icon + '  ' + response.message ) );
+            // console.log( 'File:   '.bold.white + shell.pwd() );
+            console.log();
+        }
+        else {
+            console.log(response.icon + '  '
+                + colors.bold[ response.color ]( response.message )
+                + ' in ' + shell.pwd()
+            );
+        }
     }
     // shell.cd( path );
 }

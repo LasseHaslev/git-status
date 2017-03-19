@@ -12,6 +12,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "colors": "^1.1.2",
     "shelljs": "^0.7.7"
   }
 }
