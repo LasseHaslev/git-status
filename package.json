@@ -1,5 +1,5 @@
 {
-  "name": "git-status",
+  "name": "@lassehaslev/git-status",
   "version": "0.1.0",
   "description": "Run git commands on all recursive folders",
   "main": "app.js",
@@ -10,7 +10,7 @@
   "bin": {
     "git-status": "./bin/app.js"
   },
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
     "shelljs": "^0.7.7"
