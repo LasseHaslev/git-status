@@ -16,17 +16,22 @@ var responses = {
     ok: {
         message: 'Everything is ok',
         continue: false,
-        icon: '✅'
+        icon: '✅',
     },
     notPushed: {
         message: 'Changes are not pushed to remote',
         continue: false,
-        icon: '❗️'
+        icon: '❗️',
     },
     uncommited: {
         message: 'Uncommited changes',
         continue: false,
-        icon: '⛔️'
+        icon: '⛔️',
+    },
+    unpublished: {
+        message: 'Not public',
+        continue: false,
+        icon: '❗️',
     },
 };
     
@@ -50,7 +55,7 @@ var checkGitResponse = function() {
     if (needleInHaystack( 'Not a git repository', statusMessage )) {
         return responses.notGit;
     }
-    else if ( needleInHaystack("nothing to commit, working directory clean", statusMessage) && needleInHaystack("Your branch is up-to-date", statusMessage )) {
+    else if ( needleInHaystack("Your branch is up-to-date", statusMessage) && needleInHaystack("nothing to commit", statusMessage )) {
         return responses.ok;
     }
     else if ( needleInHaystack("nothing to commit, working directory clean", statusMessage )) {
