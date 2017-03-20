@@ -1,6 +1,6 @@
 {
   "name": "@lassehaslev/git-status",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Run git commands on all recursive folders",
   "main": "app.js",
   "scripts": {
