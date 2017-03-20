@@ -42,9 +42,9 @@ var responses = {
     
 
 var init = function() {
-    console.log( 'Checking git statuses from:' );
-    pwd = shell.exec( 'pwd' ).toString();
-    console.log('');
+    pwd = shell.exec( 'pwd', { silent: true } ).toString().slice(0,-1);
+    console.log( colors.bold.cyan( '--- Checking from: '+ pwd +' ---' ));
+    console.log();
 
     checkGitStatus( pwd );
 }
