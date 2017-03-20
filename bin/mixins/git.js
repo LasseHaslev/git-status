@@ -1,0 +1,97 @@
+var shell = require( 'shelljs' );
+var helpers = require( './helpers' );
+var variables = require( './variables' );
+
+var git = {
+    checkGitResponse: function() {
+        var statusMessage = shell.exec( 'git status 2>&1', { silent: true } ).toString();
+
+
+        if (helpers.needleInHaystack( 'Not a git repository', statusMessage )) {
+            return variables.responses.notGit;
+        }
+        else if ( helpers.needleInHaystack("Your branch is up-to-date", statusMessage)
+            && helpers.needleInHaystack("clean", statusMessage )
+            && helpers.needleInHaystack("nothing to commit", statusMessage )) {
+            return variables.responses.ok;
+        }
+        else if ( helpers.needleInHaystack("nothing to commit", statusMessage )) {
+            return variables.responses.notPushed;
+        }
+        else if ( helpers.needleInHaystack("Your branch is up-to-date", statusMessage) || ! helpers.needleInHaystack("nothing to commit, working directory clean", statusMessage )) {
+            return variables.responses.uncommited;
+        }
+        else {
+            return variables.responses.uncatched;
+        }
+
+    },
+
+    getCurrentBranchName: function() {
+        return shell.exec( 'git rev-parse --abbrev-ref HEAD', {silent: true} ).toString().slice( 0, -1 );
+    },
+    checkAllBranches: function() {
+        var currentBranch = git.getCurrentBranchName();
+        var branches = git.getAllBranches( currentBranch );
+        if (branches.length) {
+
+            for (var i = 0, len = branches.length; i < len; i++) {
+                var branch = branches[i];
+
+                shell.exec( 'git checkout ' + branch, { silent: true } );
+
+                var response = git.checkGitResponse();
+                helpers.buildResponse( response, branch, true );
+
+            }
+
+            // Reset to last branch
+            shell.exec( 'git checkout ' + currentBranch, { silent: true } );
+            console.log();
+        }
+    },
+    getAllBranches: function( currentBranch ) {
+        return shell.exec('git branch', {silent:true}).toString().split( '\n' )
+        .map( function(branchName) {
+            var name = branchName.replace( /^\**\s+([A-z\-_]+)$/, '$1' )
+            return name;
+        } )
+        .slice(0,-1)
+        .filter( function( branchName ) {
+            return branchName != currentBranch;
+        } );
+    },
+
+    checkGitStatus: function( path ) {
+        var response = git.checkGitResponse();
+
+        if (response.continue) {
+            git.checkSubDirectory();
+            return false;
+        }
+
+        var currentBranch = git.getCurrentBranchName();
+        helpers.buildResponse( response, currentBranch );
+        git.checkAllBranches();
+
+    },
+    checkSubDirectory: function() {
+        var currentPath= shell.pwd();
+        var files = shell.ls('-d', '*/' );
+
+        files.forEach( function( file ) {
+
+            if (variables.excludeFolders.indexOf( file ) !== -1) {
+                return false;
+            }
+
+            // Reset after each
+            shell.cd( currentPath );
+
+            shell.cd( file );
+            git.checkGitStatus();
+
+        } );
+    },
+};
+module.exports = git;
