@@ -77,9 +77,9 @@ var checkGitResponse = function() {
 
 };
 
-var buildResponse = function( response, branch ) {
+var buildResponse = function( response, branch, subbranch ) {
     if (response.message) {
-        var branchSpacing = branch ? '   ' : '';
+        var branchSpacing = subbranch ? '   ' : '';
         var branchName = branch ? '(' + branch + ') ' : '';
         console.log( branchSpacing + response.icon + '  '
             + colors.bold[ response.color ]( response.message )
@@ -91,8 +91,12 @@ var buildResponse = function( response, branch ) {
     // shell.cd( path );
 }
 
+var getCurrentBranchName = function() {
+    return shell.exec( 'git rev-parse --abbrev-ref HEAD', {silent: true} ).toString().slice( 0, -1 );
+}
+
 var checkAllBranches = function() {
-    var currentBranch = shell.exec( 'git rev-parse --abbrev-ref HEAD', {silent: true} ).toString().slice( 0, -1 );
+    var currentBranch = getCurrentBranchName();
     var branches = getAllBranches( currentBranch );
     if (branches.length) {
 
@@ -102,7 +106,7 @@ var checkAllBranches = function() {
             shell.exec( 'git checkout ' + branch, { silent: true } );
 
             var response = checkGitResponse();
-            buildResponse( response, branch );
+            buildResponse( response, branch, true );
 
         }
 
@@ -132,7 +136,8 @@ var checkGitStatus = function( path ) {
         return false;
     }
 
-    buildResponse( response );
+    var currentBranch = getCurrentBranchName();
+    buildResponse( response, currentBranch );
     checkAllBranches();
 
 };
