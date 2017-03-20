@@ -77,11 +77,15 @@ var checkGitResponse = function() {
 
 };
 
-var buildResponse = function( response, advanced ) {
+var buildResponse = function( response, branch ) {
     if (response.message) {
-        console.log(response.icon + '  '
+        var branchSpacing = branch ? '   ' : '';
+        var branchName = branch ? '(' + branch + ') ' : '';
+        console.log( branchSpacing + response.icon + '  '
             + colors.bold[ response.color ]( response.message )
-            + ' in ' + shell.pwd()
+            + ' in '
+            + colors.cyan(branchName)
+            + shell.pwd()
         );
     }
     // shell.cd( path );
@@ -91,7 +95,20 @@ var checkAllBranches = function() {
     var currentBranch = shell.exec( 'git rev-parse --abbrev-ref HEAD', {silent: true} ).toString().slice( 0, -1 );
     var branches = getAllBranches( currentBranch );
     if (branches.length) {
-        console.log(branches);
+
+        for (var i = 0, len = branches.length; i < len; i++) {
+            var branch = branches[i];
+
+            shell.exec( 'git checkout ' + branch, { silent: true } );
+
+            var response = checkGitResponse();
+            buildResponse( response, branch );
+
+        }
+
+        // Reset to last branch
+        shell.exec( 'git checkout ' + currentBranch, { silent: true } );
+        console.log();
     }
 }
 
