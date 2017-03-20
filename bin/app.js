@@ -43,8 +43,8 @@ var responses = {
 
 var init = function() {
     pwd = shell.exec( 'pwd', { silent: true } ).toString().slice(0,-1);
-    console.log( colors.bold.cyan( '--- Checking from: '+ pwd +' ---' ));
     console.log();
+    console.log( colors.bold.cyan( '--- Checking from: '+ pwd +' ---' ));
 
     checkGitStatus( pwd );
 }
