@@ -77,21 +77,27 @@ var git = {
     },
     checkSubDirectory: function() {
         var currentPath= shell.pwd();
-        var files = shell.ls('-d', '*/' );
+        var subdirCount = shell.exec('find . -mindepth 1 -maxdepth 1 -type d | wc -l', {silent:true});
 
-        files.forEach( function( file ) {
+        if(subdirCount > 0){
+            var files = shell.ls('-d', '*/' );
 
-            if (variables.excludeFolders.indexOf( file ) !== -1) {
-                return false;
+            if(files){
+                files.forEach( function( file ) {
+
+                    if (variables.excludeFolders.indexOf( file ) !== -1) {
+                        return false;
+                    }
+
+                    // Reset after each
+                    shell.cd( currentPath );
+
+                    shell.cd( file );
+                    git.checkGitStatus();
+
+                } );
             }
-
-            // Reset after each
-            shell.cd( currentPath );
-
-            shell.cd( file );
-            git.checkGitStatus();
-
-        } );
+        }
     },
 };
 module.exports = git;
