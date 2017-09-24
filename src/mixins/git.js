@@ -2,6 +2,8 @@ var shell = require( 'shelljs' );
 var helpers = require( './helpers' );
 var variables = require( './variables' );
 
+var options = global.options;
+
 var git = {
     checkGitResponse: function() {
         var statusMessage = shell.exec( 'git status 2>&1', { silent: true } ).toString();
@@ -65,7 +67,9 @@ var git = {
     checkGitStatus: function( path ) {
         var response = git.checkGitResponse();
 
-        if (response.continue) {
+        // Run if we should go depper but not too deep
+        var depth = git.checkCurrentDepth();
+        if ( git.shouldContinue(response) ) {
             git.checkSubDirectory();
             return false;
         }
@@ -75,6 +79,19 @@ var git = {
         git.checkAllBranches();
 
     },
+
+    shouldContinue( response ) {
+        return response.continue
+            && ( options.depth == -1 || git.checkCurrentDepth() <= options.depth-1 );
+    },
+
+    checkCurrentDepth() {
+        var relativePathFromStartedPath = shell.pwd().toString().replace( global.gitStartPath, '' );
+
+        // Check how deep it is
+        return relativePathFromStartedPath.split( '/' ).length - 1;
+    },
+
     checkSubDirectory: function() {
         var currentPath= shell.pwd();
         var subdirCount = shell.exec('find . -mindepth 1 -maxdepth 1 -type d | wc -l', {silent:true});

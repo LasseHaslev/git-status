@@ -2,17 +2,21 @@
   "name": "@lassehaslev/git-status",
   "version": "0.2.2",
   "description": "Run git commands on all recursive folders",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava"
   },
   "author": "Lasse S. Haslev",
   "bin": {
-    "git-status": "./bin/app.js"
+    "git-status": "./src/app.js"
   },
   "license": "MIT",
   "dependencies": {
+    "argparse": "^1.0.9",
     "colors": "^1.1.2",
     "shelljs": "^0.7.7"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0"
   }
 }
