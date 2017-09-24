@@ -7,6 +7,11 @@
     "test": "ava"
   },
   "author": "Lasse S. Haslev",
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://github.com/LasseHaslev/git-status.git"
+  },
   "bin": {
     "git-status": "./src/app.js"
   },
@@ -15,8 +20,5 @@
     "argparse": "^1.0.9",
     "colors": "^1.1.2",
     "shelljs": "^0.7.7"
-  },
-  "devDependencies": {
-    "ava": "^0.22.0"
   }
 }
