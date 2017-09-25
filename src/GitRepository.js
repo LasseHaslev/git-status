@@ -94,7 +94,7 @@ module.exports = class GitRepository {
                 + colors.bold[ response.color ]( response.message )
                 + ' in '
                 + colors.cyan( '(' + this.getCurrentBranchName() + ') ' )
-                + this.path
+                // + this.path
             );
         }
         else {} // Should we add something here?

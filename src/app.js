@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 var shell = require( 'shelljs' );
+var colors = require( 'colors' );
 
 const FileFinder = require( './FileFinder' );
 const GitRepo = require( './GitRepository' );
@@ -29,13 +30,19 @@ finder.start( ( files ) => {
 
     let pwd = shell.pwd();
 
-    // files = [ files[0], files[1] ]; // Prevents files to be to long
+    files = [ files[0], files[1] ]; // Prevents files to be to long
 
     for (var i = 0, len = files.length; i < len; i++) {
         var git = new GitRepo( files[i] );
+
+
+        console.log(); // Add spacing before output
+        console.log(
+            colors.bold[ 'green' ]( '-- Checking repository at ' + pwd )
+        );
         git.status();
         git.branchStatus( true );
-        console.log();
+
     }
 
     // Reset after
