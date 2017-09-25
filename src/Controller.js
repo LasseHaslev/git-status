@@ -54,7 +54,7 @@ module.exports = class GitController {
     }
 
     limitToMaxRepositoriesToHandleBasedOnOption() {
-        return this.files = options.max_repos > 0 ? this.files.slice(0, options.max_repos) : files
+        return this.files = options.max_repos > 0 ? this.files.slice(0, options.max_repos) : this.files;
     }
 
     runGitStatusOnAllFoundRepositories() {

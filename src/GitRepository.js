@@ -55,15 +55,43 @@ module.exports = class GitRepository {
             for (var i = 0, len = branches.length; i < len; i++) {
                 var branch = branches[i];
 
-                shell.exec( 'git checkout ' + branch, { silent: true } );
+                this.stash();
+                this.switchToBranch( branch );
 
                 this.checkGitResponse(shouldAddSpacing);
 
             }
 
             // Reset to last branch
-            shell.exec( 'git checkout ' + currentBranch, { silent: true } );
+            this.switchToBranch( currentBranch );
+            this.stashPop();
         }
+    }
+
+    /**
+     * Switch to branch
+     *
+     * @param string branchName
+     *
+     * @return void
+     */
+    stash() {
+        shell.exec( 'git stash', { silent: true } );
+    }
+
+    stashPop() {
+        shell.exec( 'git stash pop', { silent: true } );
+    }
+
+    /**
+     * Switch to branch
+     *
+     * @param string branchName
+     *
+     * @return void
+     */
+    switchToBranch( branch ) {
+        shell.exec( 'git checkout ' + branch, { silent: true } );
     }
 
     /**
