@@ -16,7 +16,7 @@ parser.addArgument(
     [ '-d', '--depth' ],
     {
         help: 'Set how deep you will search for git repos. -1 Equals no restriction. Default: 0.',
-        defaultValue: 5,
+        defaultValue: 1,
         // defaultValue: -1,
     }
 );
@@ -24,20 +24,17 @@ global.options = parser.parseArgs();
 
 var variables = require( './mixins/variables' );
 var helpers = require( './mixins/helpers' );
-var git = require( './mixins/git' );
+const Git = require( './mixins/git' );
 
 let finder = new FileFinder();
-finder.start( ( data ) => {
-    console.log(data);
-    return;
+finder.start( ( files ) => {
 
-    var pwd = shell.exec( 'pwd', { silent: true } ).toString().slice(0,-1);
-    console.log();
-    console.log( colors.bold.cyan( '--- Checking from: '+ pwd +' ---' ));
+    // console.log(files);
 
-    global.gitStartPath = shell.pwd().toString();
+    let pwd = shell.pwd();
 
-    git.checkGitStatus( pwd );
+    let git = new Git( files );
+    git.status();
 
     // Reset after
     shell.cd( pwd );

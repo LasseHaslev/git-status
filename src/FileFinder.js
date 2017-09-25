@@ -36,7 +36,7 @@ module.exports = class FileFinder {
     getGitRepositoriesInSubfolders() {
 
         return new Promise( ( resolve, reject ) => {
-            if (global.options.depth == -1) {
+            if (global.options.depth == -1 || global.options.depth == 0) {
                 var command = 'find . -name .git -type d -prune';
             }
             else {
