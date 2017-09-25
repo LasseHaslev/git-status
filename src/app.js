@@ -1,8 +1,8 @@
 #! /usr/bin/env node
 var shell = require( 'shelljs' );
-var colors = require( 'colors' );
 
 const FileFinder = require( './FileFinder' );
+const GitRepo = require( './GitRepository' );
 
 // Setup arguments
 var ArgumentParser = require('argparse').ArgumentParser;
@@ -22,10 +22,6 @@ parser.addArgument(
 );
 global.options = parser.parseArgs();
 
-var variables = require( './mixins/variables' );
-var helpers = require( './mixins/helpers' );
-const GitRepo = require( './GitRepository' );
-
 let finder = new FileFinder();
 finder.start( ( files ) => {
 
@@ -33,15 +29,15 @@ finder.start( ( files ) => {
 
     let pwd = shell.pwd();
 
+    // files = [ files[0], files[1] ]; // Prevents files to be to long
+
     for (var i = 0, len = files.length; i < len; i++) {
         var git = new GitRepo( files[i] );
         git.status();
-        git.branchStatus();
+        git.branchStatus( true );
+        console.log();
     }
 
     // Reset after
     shell.cd( pwd );
 } );
-
-
-

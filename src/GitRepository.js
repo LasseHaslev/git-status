@@ -1,8 +1,23 @@
 var shell = require( 'shelljs' );
-var helpers = require( './mixins/helpers' );
-var variables = require( './mixins/variables' );
+var colors = require( 'colors' );
 
 var options = global.options;
+
+const RESPONSE_OK = {
+    message: 'Everything is ok',
+    icon: '✅',
+    color: 'green',
+};
+const RESPONSE_NOT_PUSHED = {
+    message: 'Changes are not pushed to remote',
+    icon: '❗️',
+    color: 'red',
+};
+const RESPONSE_UNCOMMITED = {
+    message: 'Uncommited changes',
+    icon: '⛔️',
+    color: 'red',
+};
 
 module.exports = class GitRepository {
 
@@ -15,6 +30,7 @@ module.exports = class GitRepository {
     constructor( pathToRepo ) {
         // Move into folder
         shell.cd( pathToRepo );
+        this.path = pathToRepo;
     }
 
     /**
@@ -23,12 +39,7 @@ module.exports = class GitRepository {
      * @return void
      */
     status() {
-
-        var response = this.checkGitResponse();
-
-        var currentBranch = this.getCurrentBranchName();
-        helpers.buildResponse( response, currentBranch );
-
+        this.checkGitResponse();
     }
 
     /**
@@ -36,7 +47,7 @@ module.exports = class GitRepository {
      *
      * @return void
      */
-    branchStatus() {
+    branchStatus( shouldAddSpacing = false ) {
         var currentBranch = this.getCurrentBranchName();
         var branches = this.getAllBranches( currentBranch );
         if (branches.length) {
@@ -46,14 +57,12 @@ module.exports = class GitRepository {
 
                 shell.exec( 'git checkout ' + branch, { silent: true } );
 
-                var response = this.checkGitResponse();
-                helpers.buildResponse( response, branch, true );
+                this.checkGitResponse(shouldAddSpacing);
 
             }
 
             // Reset to last branch
             shell.exec( 'git checkout ' + currentBranch, { silent: true } );
-            console.log();
         }
     }
 
@@ -62,28 +71,38 @@ module.exports = class GitRepository {
      *
      * @return object
      */
-    checkGitResponse() {
+    checkGitResponse( shouldAddSpacing = false ) {
         var statusMessage = shell.exec( 'git status 2>&1', { silent: true } ).toString();
 
+        var response = null;
 
-        if (helpers.needleInHaystack( 'Not a git repository', statusMessage )) {
-            return variables.responses.notGit;
+        if ( this.findStringInString("Your branch is up-to-date", statusMessage)
+            && this.findStringInString("clean", statusMessage )
+            && this.findStringInString("nothing to commit", statusMessage )) {
+            response = RESPONSE_OK;
         }
-        else if ( helpers.needleInHaystack("Your branch is up-to-date", statusMessage)
-            && helpers.needleInHaystack("clean", statusMessage )
-            && helpers.needleInHaystack("nothing to commit", statusMessage )) {
-            return variables.responses.ok;
+        else if ( this.findStringInString("nothing to commit", statusMessage )) {
+            response = RESPONSE_NOT_PUSHED;
         }
-        else if ( helpers.needleInHaystack("nothing to commit", statusMessage )) {
-            return variables.responses.notPushed;
-        }
-        else if ( helpers.needleInHaystack("Your branch is up-to-date", statusMessage) || ! helpers.needleInHaystack("nothing to commit, working directory clean", statusMessage )) {
-            return variables.responses.uncommited;
-        }
-        else {
-            return variables.responses.uncatched;
+        else if ( this.findStringInString("Your branch is up-to-date", statusMessage) || ! this.findStringInString("nothing to commit, working directory clean", statusMessage )) {
+            response = RESPONSE_UNCOMMITED;
         }
 
+        if (response) {
+            var spacingBeforeOutput = shouldAddSpacing ? '   ' : '';
+            console.log( spacingBeforeOutput + response.icon + '  '
+                + colors.bold[ response.color ]( response.message )
+                + ' in '
+                + colors.cyan( '(' + this.getCurrentBranchName() + ') ' )
+                + this.path
+            );
+        }
+        else {} // Should we add something here?
+
+    }
+
+    findStringInString( needle, haystack ) {
+        return haystack.indexOf( needle ) !== -1;
     }
 
     /**
