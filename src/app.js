@@ -2,6 +2,8 @@
 var shell = require( 'shelljs' );
 var colors = require( 'colors' );
 
+const FileFinder = require( './FileFinder' );
+
 // Setup arguments
 var ArgumentParser = require('argparse').ArgumentParser;
 var parser = new ArgumentParser({
@@ -14,7 +16,8 @@ parser.addArgument(
     [ '-d', '--depth' ],
     {
         help: 'Set how deep you will search for git repos. -1 Equals no restriction. Default: 0.',
-        defaultValue: 1,
+        defaultValue: 5,
+        // defaultValue: -1,
     }
 );
 global.options = parser.parseArgs();
@@ -23,13 +26,22 @@ var variables = require( './mixins/variables' );
 var helpers = require( './mixins/helpers' );
 var git = require( './mixins/git' );
 
-var pwd = shell.exec( 'pwd', { silent: true } ).toString().slice(0,-1);
-console.log();
-console.log( colors.bold.cyan( '--- Checking from: '+ pwd +' ---' ));
+let finder = new FileFinder();
+finder.start( ( data ) => {
+    console.log(data);
+    return;
 
-global.gitStartPath = shell.pwd().toString();
+    var pwd = shell.exec( 'pwd', { silent: true } ).toString().slice(0,-1);
+    console.log();
+    console.log( colors.bold.cyan( '--- Checking from: '+ pwd +' ---' ));
 
-git.checkGitStatus( pwd );
+    global.gitStartPath = shell.pwd().toString();
 
-// Reset after
-shell.cd( pwd );
+    git.checkGitStatus( pwd );
+
+    // Reset after
+    shell.cd( pwd );
+} );
+
+
+
