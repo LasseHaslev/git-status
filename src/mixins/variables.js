@@ -1,10 +1,4 @@
 module.exports = {
-    excludeFolders: [
-        // '.',
-        // '..',
-        'node_modules/',
-        'vendor/',
-    ],
     responses: {
         ok: {
             message: 'Everything is ok',

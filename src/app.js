@@ -24,7 +24,7 @@ global.options = parser.parseArgs();
 
 var variables = require( './mixins/variables' );
 var helpers = require( './mixins/helpers' );
-const Git = require( './mixins/git' );
+const GitRepo = require( './GitRepository' );
 
 let finder = new FileFinder();
 finder.start( ( files ) => {
@@ -33,8 +33,11 @@ finder.start( ( files ) => {
 
     let pwd = shell.pwd();
 
-    let git = new Git( files );
-    git.status();
+    for (var i = 0, len = files.length; i < len; i++) {
+        var git = new GitRepo( files[i] );
+        git.status();
+        git.branchStatus();
+    }
 
     // Reset after
     shell.cd( pwd );
