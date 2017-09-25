@@ -22,7 +22,7 @@ module.exports = class FileFinder {
     }
 
     spinnerStart() {
-        this.spinner = ora('Finding git repositories').start();
+        this.spinner = ora('Finding git repositories under ' + shell.pwd()).start();
     }
 
     spinnerSucceed() {
@@ -40,7 +40,7 @@ module.exports = class FileFinder {
                 var command = 'find . -name .git -type d -prune';
             }
             else {
-                var command = 'find . -name .git -type d -prune -maxdepth ' + ( 1 + global.options.depth );
+                var command = 'find . -name .git -type d -prune -maxdepth ' + ( 1 + parseInt( global.options.depth ) );
             }
 
             let response = shell.exec( command, {
