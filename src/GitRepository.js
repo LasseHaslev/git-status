@@ -100,33 +100,61 @@ module.exports = class GitRepository {
      * @return object
      */
     checkGitResponse( shouldAddSpacing = false ) {
-        var statusMessage = shell.exec( 'git status 2>&1', { silent: true } ).toString();
 
-        var response = null;
-
-        if ( this.findStringInString("Your branch is up-to-date", statusMessage)
-            && this.findStringInString("clean", statusMessage )
-            && this.findStringInString("nothing to commit", statusMessage )) {
-            response = RESPONSE_OK;
-        }
-        else if ( this.findStringInString("nothing to commit", statusMessage )) {
-            response = RESPONSE_NOT_PUSHED;
-        }
-        else if ( this.findStringInString("Your branch is up-to-date", statusMessage) || ! this.findStringInString("nothing to commit, working directory clean", statusMessage )) {
-            response = RESPONSE_UNCOMMITED;
+        if (this.hasUncommitedChanges()) {
+            this.respondWithMessage( RESPONSE_UNCOMMITED, shouldAddSpacing );
+            return;
         }
 
-        if (response) {
-            var spacingBeforeOutput = shouldAddSpacing ? '   ' : '';
-            console.log( spacingBeforeOutput + response.icon + '  '
-                + colors.bold[ response.color ]( response.message )
-                + ' in '
-                + colors.cyan( '(' + this.getCurrentBranchName() + ') ' )
-                // + this.path
-            );
+        if (this.isPushedToRemote()) {
+            this.respondWithMessage( RESPONSE_OK, shouldAddSpacing );
         }
-        else {} // Should we add something here?
+        else {
+            this.respondWithMessage( RESPONSE_NOT_PUSHED, shouldAddSpacing );
+        }
 
+    }
+
+    /**
+     * Check if current branch has uncommited changes
+     *
+     * @return boolean
+     */
+    hasUncommitedChanges() {
+        var statusMessage = shell.exec( 'git status --short 2>&1', { silent: true } ).toString();
+        return statusMessage !== '';
+    }
+
+    /**
+     * Check if current branch is pushed to remote
+     *
+     * @return boolean
+     */
+    isPushedToRemote() {
+        var statusMessage = shell.exec( 'git status --short --branch 2>&1', { silent: true } ).toString();
+
+        // Check if has origin
+        if ( ! this.findStringInString("...", statusMessage )) {
+            return false;
+        }
+
+        // Check if is ahead
+        return ! this.findStringInString("ahead", statusMessage );
+    }
+
+    /**
+     * Respond
+     *
+     * @return void
+     */
+    respondWithMessage( response, shouldAddSpacing = false ) {
+        var spacingBeforeOutput = shouldAddSpacing ? '   ' : '';
+        console.log( spacingBeforeOutput + response.icon + '  '
+            + colors.bold[ response.color ]( response.message )
+            + ' in '
+            + colors.cyan( '(' + this.getCurrentBranchName() + ') ' )
+            // + this.path
+        );
     }
 
     findStringInString( needle, haystack ) {
