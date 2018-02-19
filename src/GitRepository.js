@@ -55,6 +55,10 @@ module.exports = class GitRepository {
             for (var i = 0, len = branches.length; i < len; i++) {
                 var branch = branches[i];
 
+                if (branch == currentBranch) {
+                    continue;
+                }
+
                 this.stash();
                 this.switchToBranch( branch );
 
