@@ -1,6 +1,8 @@
 # @lassehaslev/git-status
 > Check `git status` on all branches inn all subfolders.
 
+![Demo](git-status-demo.gif)
+
 ## Install
 ``` bash
 npm install -g @lassehaslev/git-status
