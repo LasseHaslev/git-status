@@ -1,5 +1,5 @@
 # @lassehaslev/git-status
-> Check `git status` in folder and subfolders.
+> Check `git status` on all branches inn all subfolders.
 
 ## Install
 ``` bash
